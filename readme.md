@@ -1,6 +1,6 @@
 # Altus | Sovereign AI Legal Platform (Prototype)
 
-**Project Status:** High-Fidelity Interactive Prototype (MVP Candidate)\
+**Project Status:** High-Fidelity Interactive Prototype (MVP Candidate)
 
 **Project Name:** Altus (Working Title / Codename)
 
