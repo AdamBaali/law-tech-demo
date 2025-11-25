@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altus | Sovereign AI Legal Platform</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50:'#eff6ff', 100:'#dbeafe', 400:'#60a5fa', 500:'#3b82f6', 600:'#2563eb', 700:'#1d4ed8' },
+                        slate: { 800:'#1e293b', 850:'#162032', 900:'#0f172a' },
+                        teal: { 400: '#2dd4bf', 500: '#14b8a6' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    backgroundImage: { 'grid-pattern': "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%233b82f6' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E\")" }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        body { background-color: #0f172a; color: #cbd5e1; }
+        .glass-panel { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .tech-card { background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.7) 100%); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.3s ease; }
+        .tech-card:hover { border-color: rgba(59, 130, 246, 0.4); transform: translateY(-2px); box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.15); }
+        .hidden-view { display: none !important; }
+        .view-section { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .toggle-checkbox:checked { right: 0; border-color: #3b82f6; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #3b82f6; }
+        @keyframes stamp { 0% { opacity: 0; transform: scale(2) rotate(-10deg); } 50% { opacity: 1; transform: scale(0.9) rotate(-10deg); } 100% { transform: scale(1) rotate(-10deg); } }
+        .stamp-seal { animation: stamp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .scan-line { position: absolute; left: 0; width: 100%; height: 2px; background: linear-gradient(to right, transparent, #3b82f6, transparent); animation: scan 4s linear infinite; pointer-events: none; z-index: 10; }
+        @keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+        .check-list li { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; color: #cbd5e1; font-size: 0.875rem; }
+        .check-list li i { color: #3b82f6; width: 1rem; height: 1rem; }
+    </style>
+</head>
+<body class="font-sans antialiased overflow-x-hidden selection:bg-brand-500 selection:text-white">
+
+    <nav class="fixed w-full z-50 glass-panel transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.switchView('landing')">
+                    <div class="w-9 h-9 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg">A</div>
+                    <span class="text-2xl text-white font-bold tracking-tight">Altus</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <button onclick="window.switchView('landing')" class="hover:text-brand-400 transition-colors text-sm font-medium" data-i18n="nav_platform">Platform</button>
+                    <button onclick="window.switchView('landing'); setTimeout(() => document.getElementById('pricing').scrollIntoView({behavior: 'smooth'}), 100);" class="hover:text-brand-400 transition-colors text-sm font-medium" data-i18n="nav_pricing">Pricing</button>
+                    <button onclick="window.switchView('partner-landing')" class="hover:text-brand-400 transition-colors text-sm font-medium" data-i18n="nav_partners">For Lawyers</button>
+                    <div class="h-6 w-px bg-slate-700"></div>
+                    <div class="relative group z-50">
+                        <button class="flex items-center gap-1 text-sm text-slate-300 hover:text-white px-2 py-2"><i data-lucide="globe" class="w-4 h-4"></i> <span id="current-lang-label">EN</span></button>
+                        <div class="absolute right-0 top-full mt-2 w-32 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-50">
+                            <button onclick="window.setLanguage('en')" class="block w-full text-left px-4 py-2 text-sm hover:bg-slate-700 text-white rounded-t-lg">English</button>
+                            <button onclick="window.setLanguage('fr')" class="block w-full text-left px-4 py-2 text-sm hover:bg-slate-700 text-white">Français</button>
+                            <button onclick="window.setLanguage('es')" class="block w-full text-left px-4 py-2 text-sm hover:bg-slate-700 text-white">Español</button>
+                            <button onclick="window.setLanguage('ca')" class="block w-full text-left px-4 py-2 text-sm hover:bg-slate-700 text-white rounded-b-lg">Català</button>
+                        </div>
+                    </div>
+                    <div id="auth-buttons-logged-out" class="flex items-center gap-4">
+                        <button onclick="window.switchView('partner-landing')" class="text-slate-300 hover:text-white text-sm font-medium transition-colors" data-i18n="nav_login">Log in</button>
+                        <button onclick="window.switchView('customer-signup')" class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-lg hover:shadow-brand-500/20" data-i18n="nav_start">Start Free</button>
+                    </div>
+                    <div id="auth-buttons-logged-in" class="hidden flex items-center gap-4">
+                        <div class="flex items-center gap-3 text-sm bg-slate-800 pl-1 pr-3 py-1 rounded-full border border-slate-700">
+                            <div class="w-6 h-6 rounded-full bg-teal-500 flex items-center justify-center text-xs font-bold text-white">MD</div>
+                            <span class="text-white font-medium" id="user-name-display">Me. Dupont</span>
+                        </div>
+                        <button onclick="window.logout()" class="text-slate-400 hover:text-white text-xs uppercase tracking-wide font-bold ml-2" data-i18n="nav_logout">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="view-landing" class="view-section pt-32 pb-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-4xl mx-auto mb-16">
+                <div class="inline-flex items-center px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-semibold mb-6"><span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span><span data-i18n="hero_status">Your Virtual Legal Department</span></div>
+                <h1 class="text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight tracking-tight"><span data-i18n="hero_title_1">Legal made</span> <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-teal-400" data-i18n="hero_title_2">Simple & Sovereign.</span></h1>
+                <p class="text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed" data-i18n="hero_subtitle">Draft contracts instantly with AI, get them reviewed by partner lawyers, and keep your data safely in Europe.</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button onclick="window.switchView('customer-signup')" class="bg-brand-600 hover:bg-brand-500 text-white text-lg px-8 py-4 rounded-xl font-semibold transition-all shadow-lg flex items-center justify-center gap-2 hover:scale-105 transform duration-200"><span data-i18n="btn_draft">Create Document</span> <i data-lucide="arrow-right" class="w-5 h-5"></i></button>
+                    <button onclick="document.getElementById('pricing').scrollIntoView({behavior: 'smooth'})" class="bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 text-lg px-8 py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2" data-i18n="nav_pricing">Pricing</button>
+                </div>
+            </div>
+
+            <div id="demo-section" class="max-w-7xl mx-auto mb-24">
+                 <h3 class="text-3xl font-bold text-white text-center mb-8" data-i18n="demo_header">Try the Editor</h3>
+                 <div class="relative bg-slate-900 rounded-xl shadow-2xl border border-slate-700 overflow-hidden flex flex-col h-[900px]">
+                    <div class="h-14 bg-slate-800/80 border-b border-slate-700 flex items-center px-5 justify-between backdrop-blur-sm sticky top-0 z-20">
+                        <div class="flex items-center gap-3">
+                            <div class="flex gap-2"><div class="w-3 h-3 rounded-full bg-slate-600"></div><div class="w-3 h-3 rounded-full bg-slate-600"></div><div class="w-3 h-3 rounded-full bg-slate-600"></div></div>
+                            <div class="ml-4 flex items-center gap-2 text-slate-300 text-sm font-medium"><i data-lucide="file-text" class="w-4 h-4 text-brand-500"></i> <span id="demo-filename">MSA_Draft_v2.pdf</span></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                             <div class="hidden md:flex items-center gap-2 px-3 py-1 bg-amber-500/10 text-amber-400 text-xs font-semibold rounded-full border border-amber-500/20" id="collab-badge" style="display:none;"><div class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div> Action Required</div>
+                             <div class="px-3 py-1 bg-green-500/10 text-green-400 text-xs font-semibold rounded-full border border-green-500/20">Auto-Saved</div>
+                             <button onclick="window.openModal('invite-modal')" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded transition-colors flex items-center gap-1 border border-slate-600"><i data-lucide="send" class="w-3 h-3"></i> <span data-i18n="btn_invite">Invite Counterparty</span></button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-1 overflow-hidden">
+                        <div class="w-64 bg-slate-800/30 border-r border-slate-700 hidden md:flex flex-col p-4">
+                            <div class="text-xs font-bold text-slate-500 uppercase mb-4 tracking-wider" data-i18n="sidebar_clauses">Outline</div>
+                            <div class="space-y-1 mb-8">
+                                <a href="#clause-definitions" class="block p-2 text-slate-400 text-sm hover:text-white">1. Definitions</a>
+                                <a href="#clause-payment" class="block p-2 text-brand-400 bg-brand-500/10 text-sm font-medium rounded border-l-2 border-brand-500">2. Payment Terms</a>
+                                <a href="#clause-liability" class="block p-2 text-slate-400 text-sm hover:text-white">3. Liability</a>
+                                <a href="#clause-termination" class="block p-2 text-slate-400 text-sm hover:text-white">4. Termination</a>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="text-xs font-bold text-slate-500 uppercase mb-2" data-i18n="sidebar_jur">Jurisdiction</div>
+                                <button onclick="window.openModal('jur-modal')" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-600 flex items-center gap-3 hover:border-brand-500 transition-colors text-left group">
+                                    <img src="https://flagcdn.com/w40/fr.png" class="w-5 rounded-sm" id="demo-flag">
+                                    <div class="flex-1"><div class="text-white text-sm font-medium group-hover:text-brand-400" id="demo-jurisdiction">France</div><div class="text-xs text-slate-500" id="demo-law-system">Civil Code</div></div>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 bg-slate-100 p-8 overflow-y-auto text-slate-900 relative scroll-smooth" id="editor-scroll">
+                            <div class="scan-line"></div>
+                            <div id="cert-stamp" class="hidden absolute top-20 right-20 z-50 pointer-events-none stamp-seal">
+                                <div class="w-40 h-40 rounded-full border-4 border-amber-600 text-amber-700 flex items-center justify-center transform rotate-12 bg-amber-600/10 backdrop-blur-sm"><div class="w-36 h-36 rounded-full border-2 border-amber-600 flex flex-col items-center justify-center text-center p-2"><div class="text-[10px] uppercase tracking-widest font-bold">Sovereign Verified</div><div class="text-2xl font-black uppercase tracking-tighter my-1">Altus<br>Certified</div><div class="text-[10px] font-mono">Nov 19 2025</div></div></div>
+                            </div>
+
+                            <div class="max-w-3xl mx-auto bg-white p-12 rounded shadow-sm min-h-[1200px]" id="doc-body">
+                                <h2 class="text-2xl font-bold mb-1 text-slate-900" id="demo-title">MASTER SERVICES AGREEMENT</h2>
+                                <p class="text-xs text-slate-500 mb-8">Reference: MSA-2025-001 | Date: November 19, 2025</p>
+                                <p class="text-sm text-slate-700 mb-6 leading-relaxed">This Master Services Agreement ("Agreement") is entered into by and between <strong>Provider Inc.</strong>, a simplified joint-stock company organized under the laws of France ("Provider"), and <strong>Client Corp</strong> ("Client").</p>
+                                
+                                <div id="clause-definitions" class="mb-8"><h3 class="text-lg font-bold mb-2 text-slate-800">1. DEFINITIONS</h3><p class="text-sm text-slate-700 leading-relaxed">"Services" means the software development and consulting services described in the Statement of Work. "Deliverables" means all code, documentation, and reports created by Provider.</p></div>
+                                <div id="clause-payment" class="mb-8 scroll-mt-20"><h3 class="text-lg font-bold mb-2 text-slate-800">2. PAYMENT TERMS</h3><div class="group relative"><p id="text-payment" onclick="window.toggleDemoExplanation('payment')" class="text-sm leading-7 p-3 rounded bg-amber-50 border-l-4 border-amber-500 cursor-pointer hover:bg-amber-100 transition-colors text-slate-800">2.1. Client shall pay all undisputed invoices within <strong class="text-red-600">ninety (90) days</strong> of receipt. Late payments shall incur no interest.</p><div id="pulse-payment" class="absolute -right-2 top-2 w-3 h-3 bg-amber-500 rounded-full animate-ping pointer-events-none"></div></div></div>
+                                <div id="clause-liability" class="mb-8 scroll-mt-20"><h3 class="text-lg font-bold mb-2 text-slate-800">3. LIMITATION OF LIABILITY</h3><div class="group relative"><p id="text-liability" onclick="window.toggleDemoExplanation('liability')" class="text-sm leading-7 p-3 rounded bg-red-50 border-l-4 border-red-500 cursor-pointer hover:bg-red-100 transition-colors text-slate-800">3.1. Notwithstanding anything to the contrary, the Provider's total aggregate liability shall be <strong class="text-red-600">unlimited</strong> for all claims.</p><div id="pulse-liability" class="absolute -right-2 top-2 w-3 h-3 bg-red-500 rounded-full animate-ping pointer-events-none"></div></div></div>
+                                <div id="clause-termination" class="mb-8 scroll-mt-20"><h3 class="text-lg font-bold mb-2 text-slate-800">4. TERMINATION</h3><div class="group relative"><p id="text-termination" onclick="window.toggleDemoExplanation('termination')" class="text-sm leading-7 p-3 rounded bg-amber-50 border-l-4 border-amber-500 cursor-pointer hover:bg-amber-100 transition-colors text-slate-800">4.1. The Provider may terminate this Agreement for convenience <strong class="text-red-600">effective immediately</strong> upon written notice.</p><div id="pulse-termination" class="absolute -right-2 top-2 w-3 h-3 bg-amber-500 rounded-full animate-ping pointer-events-none"></div></div></div>
+
+                                <div id="demo-popover" class="absolute left-1/2 -translate-x-1/2 w-80 bg-slate-900 text-white rounded-xl shadow-2xl border border-slate-600 p-5 opacity-0 pointer-events-none transition-all duration-300 transform translate-y-4 z-30">
+                                    <div class="flex justify-between items-start mb-3"><span class="text-xs font-bold text-brand-400 uppercase flex gap-1"><i data-lucide="sparkles" class="w-3 h-3"></i> Altus Insight</span><span id="popover-badge" class="bg-red-500/10 text-red-400 text-[10px] font-bold px-2 rounded border border-red-500/20">CRITICAL</span></div>
+                                    <p id="popover-text" class="text-sm text-slate-300 mb-4">Analysis text goes here.</p>
+                                    <div class="flex gap-2">
+                                        <button id="popover-btn-fix" class="flex-1 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold py-2 rounded-lg transition-colors">Auto-Fix Clause</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-80 bg-slate-50 border-l border-slate-200 p-6 hidden lg:flex flex-col overflow-y-auto">
+                            <div class="mb-6"><div class="flex justify-between text-xs mb-1.5 font-medium"><span class="text-slate-500" data-i18n="score_leg">Legality</span><span class="text-green-600 font-bold">98/100</span></div><div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-green-500 w-[98%]"></div></div></div>
+                            <div class="mb-6"><div class="flex justify-between text-xs mb-1.5 font-medium"><span class="text-slate-500" data-i18n="score_rob">Robustness</span><span id="score-robustness" class="text-red-500 font-bold transition-colors duration-500">45/100</span></div><div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden"><div id="bar-robustness" class="h-full bg-red-500 w-[45%] transition-all duration-700 ease-out"></div></div></div>
+                            <div class="mb-8"><div class="flex justify-between text-xs mb-1.5 font-medium"><span class="text-slate-500" data-i18n="score_clar">Clarity</span><span id="score-clarity" class="text-amber-500 font-bold transition-colors duration-500">62/100</span></div><div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden"><div id="bar-clarity" class="h-full bg-amber-500 w-[62%] transition-all duration-700 ease-out"></div></div><p id="clarity-msg" class="text-[10px] text-slate-400 mt-1">Contains complex "Legalese"</p></div>
+
+                            <div id="negotiation-panel" class="hidden opacity-0 transition-opacity duration-500">
+                                <div class="border-t border-slate-200 my-6"></div>
+                                <div class="bg-indigo-50 rounded-xl p-4 border border-indigo-100 shadow-inner" id="neg-box">
+                                    <div class="flex items-center gap-2 mb-3"><div class="p-1.5 bg-indigo-100 rounded-md"><i data-lucide="scale" class="w-4 h-4 text-indigo-600"></i></div><h3 class="text-xs font-bold text-indigo-900 uppercase">Conflict Detected</h3></div>
+                                    <p class="text-[10px] text-indigo-700 mb-4 leading-relaxed">The Counterparty has rejected your Liability Cap. This exposes you to critical risk.</p>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button onclick="window.applyGlobalFairness()" class="py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-lg transition-colors">Auto-Balance</button>
+                                        <button onclick="window.triggerUpsell()" class="py-2 bg-white border border-indigo-200 hover:bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-lg transition-colors flex items-center justify-center gap-1"><i data-lucide="briefcase" class="w-3 h-3"></i> Partner Review</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="py-24 relative bg-slate-850/50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 border-y border-slate-800 bg-grid-pattern">
+                 <div class="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-transparent to-slate-900/80"></div>
+                 <div class="relative z-10 max-w-7xl mx-auto">
+                    <div class="text-center mb-16"><h2 class="text-3xl font-bold text-white mb-4" data-i18n="sect_prob_title">Stop waiting on Legal</h2></div>
+                    <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                        <div class="tech-card rounded-2xl p-8 relative overflow-hidden group"><h3 class="text-lg font-bold text-white mb-4" data-i18n="prob_speed_t">Speed</h3><p class="text-sm text-slate-400 line-through" data-i18n="prob_speed_bad">3-5 days for a draft</p><p class="text-sm text-white font-medium mt-2"><i data-lucide="check" class="inline w-3 h-3 text-green-500"></i> <span data-i18n="prob_speed_good">30 seconds with Altus AI</span></p></div>
+                        <div class="tech-card rounded-2xl p-8 relative overflow-hidden group"><h3 class="text-lg font-bold text-white mb-4" data-i18n="prob_cost_t">Cost</h3><p class="text-sm text-slate-400 line-through" data-i18n="prob_cost_bad">€350/hr billable hours</p><p class="text-sm text-white font-medium mt-2"><i data-lucide="check" class="inline w-3 h-3 text-green-500"></i> <span data-i18n="prob_cost_good">Flat Monthly Sub</span></p></div>
+                        <div class="tech-card rounded-2xl p-8 relative overflow-hidden group"><h3 class="text-lg font-bold text-white mb-4" data-i18n="prob_clar_t">Clarity</h3><p class="text-sm text-slate-400 line-through" data-i18n="prob_clar_bad">Complex "Legalese"</p><p class="text-sm text-white font-medium mt-2"><i data-lucide="check" class="inline w-3 h-3 text-green-500"></i> <span data-i18n="prob_clar_good">Plain Language Engine</span></p></div>
+                    </div>
+                    <div class="mt-24 mb-12"><h2 class="text-3xl font-bold text-white mb-2" data-i18n="arch_title">Sovereign Architecture</h2><p class="text-slate-400" data-i18n="arch_subtitle">Built for the strict data residency requirements of France, Spain, and Andorra.</p></div>
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                        <div class="md:col-span-7 tech-card rounded-2xl p-8"><i data-lucide="server" class="w-10 h-10 text-brand-500 mb-6"></i><h3 class="text-xl font-bold text-white mb-2" data-i18n="arch_feat_1_t">EU-Only Hosting</h3><p class="text-slate-400 text-sm" data-i18n="arch_feat_1_d">Hosted on Scaleway (Paris). No US data transfers.</p></div>
+                        <div class="md:col-span-5 tech-card rounded-2xl p-8"><i data-lucide="shield-check" class="w-10 h-10 text-teal-400 mb-6"></i><h3 class="text-xl font-bold text-white mb-2" data-i18n="arch_feat_2_t">AES-256 Encryption</h3><p class="text-slate-400 text-sm" data-i18n="arch_feat_2_d">Keys managed via EU-based HSMs.</p></div>
+                    </div>
+                 </div>
+            </section>
+            
+            <section id="pricing" class="py-24 border-t border-slate-800">
+                <div class="text-center mb-12"><h2 class="text-3xl font-bold text-white mb-4" data-i18n="pricing_title">Pricing for modern companies</h2></div>
+                <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
+                    <div class="p-8 rounded-2xl bg-slate-900 border border-slate-700 flex flex-col">
+                        <h3 class="text-lg font-medium text-slate-300 mb-2">Free</h3><div class="text-4xl font-bold text-white mb-6">€0</div>
+                        <ul class="check-list mb-8"><li><i data-lucide="check"></i><span data-i18n="price_f_1">1 User</span></li><li><i data-lucide="check"></i><span data-i18n="price_f_2">5 Basic Documents/mo</span></li><li><i data-lucide="check"></i><span data-i18n="price_f_3">Standard Clauses</span></li></ul>
+                        <button onclick="window.switchView('customer-signup')" class="w-full py-3 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors mt-auto" data-i18n="btn_get_started">Get Started</button>
+                    </div>
+                    <div class="relative p-8 rounded-2xl bg-slate-900 border border-brand-500 shadow-2xl flex flex-col transform scale-105 z-10">
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 bg-brand-600 text-white text-xs font-bold rounded-full">POPULAR</div><h3 class="text-lg font-medium text-brand-400 mb-2">Pro</h3><div class="text-4xl font-bold text-white mb-6">€60<span class="text-sm text-slate-500 font-normal">/mo</span></div>
+                        <ul class="check-list mb-8"><li><i data-lucide="check"></i><span data-i18n="price_p_1">3 Users</span></li><li><i data-lucide="check"></i><span data-i18n="price_p_2">Unlimited Drafting</span></li><li><i data-lucide="check"></i><span data-i18n="price_p_3">Negotiation Copilot</span></li><li><i data-lucide="check"></i><span data-i18n="price_p_4">Risk Scoring</span></li></ul>
+                        <button class="w-full py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-500 transition-colors mt-auto" data-i18n="btn_trial">Start Trial</button>
+                    </div>
+                    <div class="p-8 rounded-2xl bg-slate-900 border border-slate-700 flex flex-col">
+                        <h3 class="text-lg font-medium text-slate-300 mb-2">Enterprise</h3><div class="text-4xl font-bold text-white mb-6">€450<span class="text-sm text-slate-500 font-normal">/mo</span></div>
+                        <ul class="check-list mb-8"><li><i data-lucide="check"></i><span data-i18n="price_e_1">Unlimited Users</span></li><li><i data-lucide="check"></i><span data-i18n="price_e_2">API Access</span></li><li><i data-lucide="check"></i><span data-i18n="price_e_3">SSO / SAML</span></li></ul>
+                        <button class="w-full py-3 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors mt-auto" data-i18n="btn_sales">Contact Sales</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="view-partner-landing" class="hidden-view pt-32 pb-12 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-12">
+            <div class="lg:w-5/12 pt-8">
+                <div class="inline-flex items-center px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-semibold mb-6"><span class="w-2 h-2 bg-brand-500 rounded-full mr-2 animate-pulse"></span><span data-i18n="partner_badge">Accepting FR / ES / AD Solicitors</span></div>
+                <h1 class="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight"><span data-i18n="partner_hero_1">Monetize your</span> <br/><span class="text-brand-500" data-i18n="partner_hero_2">Validation.</span></h1>
+                <div class="space-y-6">
+                    <div class="flex gap-4"><div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center border border-slate-700"><i data-lucide="file-check" class="w-5 h-5 text-green-400"></i></div><div><h3 class="text-white font-bold mb-1" data-i18n="feat_vetted_t">Pre-Vetted Drafts</h3><p class="text-sm text-slate-400" data-i18n="feat_vetted_d">Receive documents that score 90%+ on internal robustness checks.</p></div></div>
+                    <div class="flex gap-4"><div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center border border-slate-700"><i data-lucide="euro" class="w-5 h-5 text-brand-400"></i></div><div><h3 class="text-white font-bold mb-1" data-i18n="feat_payout_t">Instant Payouts</h3><p class="text-sm text-slate-400" data-i18n="feat_payout_d">Funds are escrowed by Altus before you start the review.</p></div></div>
+                </div>
+            </div>
+            <div class="lg:w-7/12">
+                <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl p-8">
+                    <h2 class="text-2xl font-bold text-white mb-6" data-i18n="form_title">Credential Verification</h2>
+                    <form class="space-y-6" onsubmit="window.handleLawyerSignup(event)">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2" data-i18n="form_fname">First Name</label><input type="text" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-500"></div>
+                            <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2" data-i18n="form_lname">Last Name</label><input type="text" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-500"></div>
+                        </div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2" data-i18n="form_email">Email (Contact)</label><input type="email" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-500"></div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2" data-i18n="form_jur">Primary Jurisdiction</label><select class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-500"><option>France</option><option>Spain</option><option>Andorra</option></select></div>
+                            <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2" data-i18n="form_bar">Bar Number</label><input type="text" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-500"></div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2" data-i18n="form_expertise">Areas of Expertise</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center p-3 bg-slate-900 border border-slate-700 rounded cursor-pointer hover:border-brand-500"><input type="checkbox" class="mr-2"><span class="text-sm">Corporate</span></label>
+                                <label class="flex items-center p-3 bg-slate-900 border border-slate-700 rounded cursor-pointer hover:border-brand-500"><input type="checkbox" class="mr-2"><span class="text-sm">Employment</span></label>
+                                <label class="flex items-center p-3 bg-slate-900 border border-slate-700 rounded cursor-pointer hover:border-brand-500"><input type="checkbox" class="mr-2"><span class="text-sm">IP/IT</span></label>
+                                <label class="flex items-center p-3 bg-slate-900 border border-slate-700 rounded cursor-pointer hover:border-brand-500"><input type="checkbox" class="mr-2"><span class="text-sm">Real Estate</span></label>
+                            </div>
+                        </div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2" data-i18n="form_upload">Upload Credentials (PDF)</label><div class="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-brand-500 hover:bg-slate-700/30 transition-colors cursor-pointer relative"><input type="file" class="absolute inset-0 opacity-0 cursor-pointer"><i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 mx-auto mb-2"></i><p class="text-xs text-slate-400">Drag & drop or click to upload</p></div></div>
+                        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold py-4 rounded-xl transition-all shadow-lg"><span data-i18n="btn_verify">Submit for Verification</span></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-lawyer-dashboard" class="hidden-view h-screen flex overflow-hidden pt-20 bg-slate-900">
+        <aside class="w-64 bg-slate-800 border-r border-slate-700 hidden md:flex flex-col fixed h-full top-20 bottom-0 left-0 z-10">
+            <div class="p-4">
+                <div class="text-xs font-bold text-slate-500 uppercase mb-3 px-2" data-i18n="dash_market">Marketplace</div>
+                <nav class="space-y-1"><a href="#" class="flex items-center gap-3 px-3 py-2 text-white bg-brand-600/20 border border-brand-500/20 rounded-lg"><i data-lucide="layout-grid" class="w-4 h-4 text-brand-400"></i><span class="font-medium" data-i18n="dash_live">Live Opportunities</span></a></nav>
+                <div class="mt-8">
+                    <div class="text-xs font-bold text-slate-500 uppercase mb-3 px-2" data-i18n="dash_earn">Earnings</div>
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700"><div class="text-slate-400 text-xs mb-1" data-i18n="dash_avail">Available Balance</div><div class="text-2xl font-bold text-white mb-3">€450.00</div><button class="w-full py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs font-medium text-white transition-colors" data-i18n="btn_withdraw">Withdraw</button></div>
+                </div>
+            </div>
+        </aside>
+        <main class="flex-1 flex flex-col md:ml-64 h-full overflow-y-auto">
+            <div class="bg-slate-900/95 border-b border-slate-700 sticky top-0 z-20 backdrop-blur-md p-4">
+                <div class="flex items-center justify-between mb-4"><h1 class="text-lg font-bold text-white flex items-center gap-2"><span data-i18n="dash_req">Open Requests</span> <span class="bg-brand-500/20 text-brand-400 text-xs px-2 py-0.5 rounded-full border border-brand-500/30 animate-pulse">Live Feed</span></h1></div>
+                <div class="flex gap-4">
+                    <select id="filter-jur" onchange="window.generateContracts()" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg p-2 outline-none"><option value="all" data-i18n="opt_all_jur">All Jurisdictions</option><option value="fr" data-i18n="opt_fr">France</option><option value="es" data-i18n="opt_es">Spain</option><option value="ad" data-i18n="opt_ad">Andorra</option></select>
+                    <select id="filter-type" onchange="window.generateContracts()" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg p-2 outline-none"><option value="all" data-i18n="opt_all_type">All Types</option><option value="it">IT / SaaS</option><option value="hr">HR / Labor</option><option value="re">Real Estate</option></select>
+                </div>
+            </div>
+            <div class="p-8 pb-32"><div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" id="contract-grid"></div></div>
+        </main>
+    </div>
+
+    <div id="view-customer-signup" class="hidden-view min-h-screen pt-24 pb-12 flex items-center justify-center">
+        <div class="max-w-2xl w-full px-4">
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl p-8 md:p-12">
+                <div class="text-center mb-10"><h2 class="text-3xl font-bold text-white mb-2">Start Your Draft</h2></div>
+                <form class="space-y-6" onsubmit="window.handleCustomerSignup(event)">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Full Name</label><input type="text" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-500"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Work Email</label><input type="email" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-500"></div>
+                    </div>
+                    <button type="submit" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold py-4 rounded-xl transition-all shadow-lg">Generate Draft Workspace</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="invite-modal" class="fixed inset-0 z-[60] hidden modal-closed flex items-center justify-center p-4">
+        <div class="modal-backdrop absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onclick="window.closeModal('invite-modal')"></div>
+        <div class="modal-content bg-slate-800 w-full max-w-2xl p-8 rounded-xl border border-slate-700 shadow-2xl relative">
+            <h3 class="text-2xl font-bold text-white mb-6" data-i18n="invite_title">Invite Collaborator</h3>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="p-6 bg-slate-900 rounded-xl border border-slate-700 hover:border-brand-500 transition-all cursor-pointer" onclick="window.triggerReviewSimulation()">
+                    <div class="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-4"><i data-lucide="users" class="w-6 h-6 text-white"></i></div><h4 class="text-lg font-bold text-white mb-2" data-i18n="invite_cp_t">Counterparty</h4><p class="text-sm text-slate-400 mb-4" data-i18n="invite_cp_d">Invite the other party to negotiate.</p><span class="text-brand-400 font-bold text-sm">Free & Unlimited</span>
+                </div>
+                <div class="p-6 bg-slate-900 rounded-xl border border-slate-700 hover:border-brand-500 transition-all cursor-pointer relative overflow-hidden" onclick="window.triggerUpsell()">
+                    <div class="absolute top-0 right-0 bg-brand-600 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg">RECOMMENDED</div><div class="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-4"><i data-lucide="shield-check" class="w-6 h-6 text-brand-400"></i></div><h4 class="text-lg font-bold text-white mb-2" data-i18n="invite_pt_t">Altus Partner Review</h4><p class="text-sm text-slate-400 mb-4" data-i18n="invite_pt_d">Get a certified lawyer review.</p><span class="text-white font-bold text-sm">From €150.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="jur-modal" class="fixed inset-0 z-[60] hidden modal-closed flex items-center justify-center p-4"><div class="modal-backdrop absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onclick="window.closeModal('jur-modal')"></div><div class="modal-content bg-slate-800 w-full max-w-md p-6 rounded-xl border border-slate-700 shadow-2xl relative"><h3 class="text-xl font-bold text-white mb-4">Select Jurisdiction</h3><div class="space-y-3"><button onclick="window.setJur('fr')" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700 border border-slate-600 transition-all text-left"><img src="https://flagcdn.com/w40/fr.png" class="w-8 rounded"><div><div class="text-white font-bold">France</div><div class="text-xs text-slate-400">Code Civil</div></div></button><button onclick="window.setJur('es')" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700 border border-slate-600 transition-all text-left"><img src="https://flagcdn.com/w40/es.png" class="w-8 rounded"><div><div class="text-white font-bold">Spain</div><div class="text-xs text-slate-400">Código Civil</div></div></button><button onclick="window.setJur('ad')" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700 border border-slate-600 transition-all text-left"><img src="https://flagcdn.com/w40/ad.png" class="w-8 rounded"><div><div class="text-white font-bold">Andorra</div><div class="text-xs text-amber-400 font-medium">Mixed System</div></div></button></div></div></div>
+    
+    <div id="gdpr-modal" class="fixed inset-0 z-[60] hidden modal-closed flex items-center justify-center p-4"><div class="modal-backdrop absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onclick="window.closeModal('gdpr-modal')"></div><div class="modal-content bg-slate-800 w-full max-w-2xl p-8 rounded-2xl border border-slate-700 shadow-2xl relative"><button onclick="window.closeModal('gdpr-modal')" class="absolute top-4 right-4 text-slate-400"><i data-lucide="x"></i></button><h2 class="text-2xl font-bold text-white mb-4" data-i18n="modal_dpa_title">DPA</h2><p class="text-slate-400 text-sm" data-i18n="modal_dpa_body">Full Article 28 GDPR Compliance. The Customer acts as the Data Controller. Altus Technologies SAS acts as the Data Processor. Sub-processors include Scaleway (France) and OVHcloud (France). No data transfer to the US.</p></div></div>
+    <div id="privacy-modal" class="fixed inset-0 z-[60] hidden modal-closed flex items-center justify-center p-4"><div class="modal-backdrop absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onclick="window.closeModal('privacy-modal')"></div><div class="modal-content bg-slate-800 w-full max-w-2xl p-8 rounded-2xl border border-slate-700 shadow-2xl relative"><button onclick="window.closeModal('privacy-modal')" class="absolute top-4 right-4 text-slate-400"><i data-lucide="x"></i></button><h2 class="text-2xl font-bold text-white mb-4" data-i18n="modal_priv_title">Privacy</h2><p class="text-slate-400 text-sm" data-i18n="modal_priv_body">Data is hosted exclusively in France (Scaleway). We use AES-256 encryption at rest and TLS 1.3 in transit. We strictly enforce a Zero-Training policy: your data is never used to train our foundation models.</p></div></div>
+    <div id="terms-modal" class="fixed inset-0 z-[60] hidden modal-closed flex items-center justify-center p-4"><div class="modal-backdrop absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onclick="window.closeModal('terms-modal')"></div><div class="modal-content bg-slate-800 w-full max-w-2xl p-8 rounded-2xl border border-slate-700 shadow-2xl relative"><button onclick="window.closeModal('terms-modal')" class="absolute top-4 right-4 text-slate-400"><i data-lucide="x"></i></button><h2 class="text-2xl font-bold text-white mb-4" data-i18n="modal_terms_title">Terms</h2><p class="text-slate-400 text-sm" data-i18n="modal_terms_body">Altus is a technology provider, not a law firm. The platform provides document assistance. Use of the platform does not constitute an attorney-client relationship.</p></div></div>
+
+    <script>
+        lucide.createIcons();
+        window.currentLang = 'en';
+        let fixedClauses = { payment: false, liability: false, termination: false };
+        let activeClause = null;
+
+        // --- TRANSLATIONS & DATA ---
+        window.t = (key) => window.translations[window.currentLang][key] || key;
+
+        window.translations = {
+            en: { 
+                nav_platform:"Platform", nav_partners:"Partners", nav_pricing:"Pricing", nav_login:"Log in", nav_start:"Start Free", nav_logout:"Sign Out",
+                hero_status:"Your Virtual Legal Department", hero_title_1:"Legal made", hero_title_2:"Simple & Sovereign.", hero_subtitle:"Draft contracts instantly with AI.",
+                btn_draft:"Create Document", btn_invite:"Invite Counterparty", sidebar_clauses:"Outline", sidebar_jur:"Jurisdiction", 
+                score_leg:"Legality", score_rob:"Robustness", score_clar:"Clarity",
+                partner_badge:"Accepting FR / ES / AD Solicitors", partner_hero_1:"Monetize your", partner_hero_2:"Validation.", partner_sub:"Join the Altus network to receive pre-drafted, AI-structured contracts.",
+                form_title:"Credential Verification", form_fname:"First Name", form_lname:"Last Name", form_email:"Email (Contact)", form_jur:"Primary Jurisdiction", form_bar:"Bar/License Number", form_expertise:"Areas of Expertise", form_upload:"Upload Credentials (PDF)", btn_verify:"Submit for Verification",
+                dash_market:"Marketplace", dash_live:"Live Opportunities", dash_earn:"Earnings", dash_avail:"Available Balance", btn_withdraw:"Withdraw", dash_req:"Open Requests",
+                invite_title:"Invite Collaborator", invite_cp_t:"Counterparty", invite_cp_d:"Invite the other party to negotiate.", invite_pt_t:"Altus Partner Review", invite_pt_d:"Get a certified lawyer review.",
+                feat_vetted_t: "Pre-Vetted Drafts", feat_vetted_d: "Receive documents that score 90%+ on internal robustness checks.",
+                feat_payout_t: "Instant Payouts", feat_payout_d: "Funds are escrowed by Altus before you start the review.",
+                btn_get_started: "Get Started", btn_trial: "Start Trial", btn_sales: "Contact Sales", pricing_title: "Pricing for modern companies", demo_header: "Try the Editor",
+                price_f_1: "1 User", price_f_2: "5 Basic Documents/mo", price_f_3: "Standard Clauses",
+                price_p_1: "3 Users", price_p_2: "Unlimited Drafting", price_p_3: "Negotiation Copilot", price_p_4: "Risk Scoring",
+                price_e_1: "Unlimited Users", price_e_2: "API Access", price_e_3: "SSO / SAML", price_e_4: "Audit Logs",
+                modal_dpa_title: "DPA", modal_dpa_body: "Full Article 28 GDPR Compliance. The Customer acts as the Data Controller. Altus Technologies SAS acts as the Data Processor. Sub-processors include Scaleway (France) and OVHcloud (France). No data transfer to the US.",
+                modal_priv_title: "Privacy", modal_priv_body: "Data is hosted exclusively in France (Scaleway). We use AES-256 encryption at rest and TLS 1.3 in transit. We strictly enforce a Zero-Training policy.",
+                modal_terms_title: "Terms", modal_terms_body: "Altus is a technology provider, not a law firm. The platform provides document assistance. Use does not constitute an attorney-client relationship.",
+                prob_speed_t: "Speed", prob_speed_bad: "3-5 days for a draft", prob_speed_good: "30 seconds with Altus AI",
+                prob_cost_t: "Cost", prob_cost_bad: "€350/hr billable hours", prob_cost_good: "Flat Monthly Sub",
+                prob_clar_t: "Clarity", prob_clar_bad: "Complex 'Legalese'", prob_clar_good: "Plain Language Engine",
+                arch_title: "Sovereign Architecture", arch_subtitle: "Built for the strict data residency requirements of France, Spain, and Andorra.",
+                arch_feat_1_t: "EU-Only Hosting", arch_feat_1_d: "Hosted on Scaleway (Paris). No US data transfers.",
+                arch_feat_2_t: "AES-256 Encryption", arch_feat_2_d: "Keys managed via EU-based HSMs.",
+                opt_all_jur: "All Jurisdictions", opt_fr: "France", opt_es: "Spain", opt_ad: "Andorra", opt_all_type: "All Types",
+                job_saas: "SaaS MSA", job_emp: "Emp. Contract", job_lease: "Lease", job_free: "Freelance", job_dpa: "DPA", job_nda: "NDA", job_sales: "Sales Agmt", job_consult: "Consulting",
+                review_btn: "Accept & Review"
+            },
+            fr: { 
+                nav_platform:"Plateforme", nav_partners:"Partenaires", nav_pricing:"Tarifs", nav_login:"Connexion", nav_start:"Essai", nav_logout:"Déconnexion",
+                hero_status:"Votre Service Juridique Virtuel", hero_title_1:"Le Droit", hero_title_2:"Simple & Souverain.", hero_subtitle:"Rédigez instantanément avec l'IA.",
+                btn_draft:"Créer un Document", btn_invite:"Inviter la Partie", sidebar_clauses:"Plan", sidebar_jur:"Juridiction",
+                score_leg:"Légalité", score_rob:"Robustesse", score_clar:"Clarté",
+                partner_badge:"Avocats FR / ES / AD", partner_hero_1:"Monétisez votre", partner_hero_2:"Validation.", partner_sub:"Rejoignez le réseau Altus.",
+                form_title:"Vérification", form_fname:"Prénom", form_lname:"Nom", form_email:"Email", form_jur:"Juridiction", form_bar:"Numéro de Barreau", form_expertise:"Expertise", form_upload:"Télécharger Justificatif", btn_verify:"Soumettre",
+                dash_market:"Marché", dash_live:"Opportunités", dash_earn:"Revenus", dash_avail:"Solde Disponible", btn_withdraw:"Retirer", dash_req:"Demandes",
+                invite_title:"Inviter Collaborateur", invite_cp_t:"Contrepartie", invite_cp_d:"Inviter l'autre partie à négocier.", invite_pt_t:"Revue Partenaire", invite_pt_d:"Obtenez une revue certifiée.",
+                feat_vetted_t: "Brouillons Vérifiés", feat_vetted_d: "Documents notés 90%+.", feat_payout_t: "Paiements Instantanés", feat_payout_d: "Fonds séquestrés.",
+                btn_get_started: "Commencer", btn_trial: "Essai Gratuit", btn_sales: "Contacter Ventes", pricing_title: "Tarifs pour entreprises modernes", demo_header: "Essayez l'Éditeur",
+                price_f_1: "1 Utilisateur", price_f_2: "5 Documents/mois", price_f_3: "Clauses Standard",
+                price_p_1: "3 Utilisateurs", price_p_2: "Rédaction Illimitée", price_p_3: "Copilote de Négociation", price_p_4: "Score de Risque",
+                price_e_1: "Utilisateurs Illimités", price_e_2: "Accès API", price_e_3: "SSO / SAML", price_e_4: "Journaux d'Audit",
+                modal_dpa_title: "DPA (RGPD)", modal_dpa_body: "Conformité totale Art 28 RGPD. Le client est Responsable de Traitement. Altus est Sous-traitant. Hébergement Scaleway (France). Pas de transfert US.",
+                modal_priv_title: "Confidentialité", modal_priv_body: "Hébergement exclusif en France. Chiffrement AES-256. Politique stricte de non-entraînement sur vos données.",
+                modal_terms_title: "CGU", modal_terms_body: "Altus est un fournisseur technologique, pas un cabinet d'avocats. L'utilisation ne crée pas de relation avocat-client.",
+                prob_speed_t: "Vitesse", prob_speed_bad: "3-5 jours", prob_speed_good: "30 secondes avec IA",
+                prob_cost_t: "Coût", prob_cost_bad: "350€/h", prob_cost_good: "Abonnement Fixe",
+                prob_clar_t: "Clarté", prob_clar_bad: "Jargon Juridique", prob_clar_good: "Langage Clair",
+                arch_title: "Architecture Souveraine", arch_subtitle: "Conçu pour la résidence des données en France, Espagne et Andorre.",
+                arch_feat_1_t: "Hébergement UE", arch_feat_1_d: "Scaleway (Paris). Pas de transfert US.",
+                arch_feat_2_t: "Chiffrement AES-256", arch_feat_2_d: "Clés gérées via HSM en UE.",
+                opt_all_jur: "Toutes Juridictions", opt_fr: "France", opt_es: "Espagne", opt_ad: "Andorre", opt_all_type: "Tous Types",
+                job_saas: "Contrat SaaS", job_emp: "CDI Cadre", job_lease: "Bail Comm.", job_free: "Freelance", job_dpa: "DPA", job_nda: "NDA", job_sales: "Contrat Vente", job_consult: "Consulting",
+                review_btn: "Accepter"
+            },
+            es: { 
+                nav_platform:"Plataforma", nav_partners:"Socios", nav_pricing:"Precios", nav_login:"Acceso", nav_start:"Empezar", nav_logout:"Salir",
+                hero_status:"Tu Departamento Legal Virtual", hero_title_1:"Derecho", hero_title_2:"Simple y Soberano.", hero_subtitle:"Redacta contratos al instante.",
+                btn_draft:"Crear Documento", btn_invite:"Invitar Parte", sidebar_clauses:"Esquema", sidebar_jur:"Jurisdicción",
+                score_leg:"Legalidad", score_rob:"Robustez", score_clar:"Claridad",
+                partner_badge:"Abogados FR / ES / AD", partner_hero_1:"Monetiza tu", partner_hero_2:"Validación.", partner_sub:"Únete a la red Altus.",
+                form_title:"Verificación", form_fname:"Nombre", form_lname:"Apellido", form_email:"Email", form_jur:"Jurisdicción", form_bar:"Num. Colegiado", form_expertise:"Experiencia", form_upload:"Subir Credenciales", btn_verify:"Enviar",
+                dash_market:"Mercado", dash_live:"Oportunidades", dash_earn:"Ganancias", dash_avail:"Saldo Disponible", btn_withdraw:"Retirar", dash_req:"Solicitudes",
+                invite_title:"Invitar Colaborador", invite_cp_t:"Contraparte", invite_cp_d:"Invita a negociar.", invite_pt_t:"Revisión de Socio", invite_pt_d:"Obtén una revisión certificada.",
+                feat_vetted_t: "Borradores Verificados", feat_vetted_d: "Documentos con puntuación 90%+.", feat_payout_t: "Pagos Instantáneos", feat_payout_d: "Fondos en custodia.",
+                btn_get_started: "Empezar", btn_trial: "Prueba Gratis", btn_sales: "Contactar Ventas", pricing_title: "Precios para empresas modernas", demo_header: "Prueba el Editor",
+                price_f_1: "1 Usuario", price_f_2: "5 Documentos/mes", price_f_3: "Cláusulas Estándar",
+                price_p_1: "3 Usuarios", price_p_2: "Redacción Ilimitada", price_p_3: "Copiloto de Negociación", price_p_4: "Puntuación de Riesgo",
+                price_e_1: "Usuarios Ilimitados", price_e_2: "Acceso API", price_e_3: "SSO / SAML", price_e_4: "Auditoría",
+                modal_dpa_title: "DPA (RGPD)", modal_dpa_body: "Cumplimiento Art 28 RGPD. El cliente es el Responsable. Altus es el Encargado. Alojamiento en Francia. Sin transferencias a EE.UU.",
+                modal_priv_title: "Privacidad", modal_priv_body: "Alojamiento exclusivo en Francia. Cifrado AES-256. Política estricta de no entrenamiento con datos del cliente.",
+                modal_terms_title: "Términos", modal_terms_body: "Altus es un proveedor de tecnología, no un bufete. El uso no crea una relación abogado-cliente.",
+                prob_speed_t: "Velocidad", prob_speed_bad: "3-5 días", prob_speed_good: "30 segundos con IA",
+                prob_cost_t: "Coste", prob_cost_bad: "350€/h", prob_cost_good: "Tarifa Plana",
+                prob_clar_t: "Claridad", prob_clar_bad: "Jerga Legal", prob_clar_good: "Lenguaje Claro",
+                arch_title: "Arquitectura Soberana", arch_subtitle: "Diseñado para Francia, España y Andorra.",
+                arch_feat_1_t: "Alojamiento UE", arch_feat_1_d: "Scaleway (París). Sin transferencias EE.UU.",
+                arch_feat_2_t: "Cifrado AES-256", arch_feat_2_d: "Claves en HSM UE.",
+                opt_all_jur: "Todas Jurisdicciones", opt_fr: "Francia", opt_es: "España", opt_ad: "Andorra", opt_all_type: "Todos Tipos",
+                job_saas: "Contrato SaaS", job_emp: "Contrato Indef.", job_lease: "Arrendamiento", job_free: "Freelance", job_dpa: "DPA", job_nda: "NDA", job_sales: "Ventas", job_consult: "Consultoría",
+                review_btn: "Aceptar"
+            },
+            ca: { 
+                nav_platform:"Plataforma", nav_partners:"Socis", nav_pricing:"Preus", nav_login:"Accés", nav_start:"Començar", nav_logout:"Sortir",
+                hero_status:"El Teu Departament Legal Virtual", hero_title_1:"Dret", hero_title_2:"Sobirà.", hero_subtitle:"Redacta contractes a l'instant amb IA.",
+                btn_draft:"Crear Document", btn_invite:"Convidar Part", sidebar_clauses:"Esquema", sidebar_jur:"Jurisdicció",
+                score_leg:"Legalitat", score_rob:"Robustesa", score_clar:"Claredat",
+                partner_badge:"Advocats FR / ES / AD", partner_hero_1:"Monetitza la teva", partner_hero_2:"Validació.", partner_sub:"Uneix-te a la xarxa Altus.",
+                form_title:"Verificació", form_fname:"Nom", form_lname:"Cognom", form_email:"Email", form_jur:"Jurisdicció", form_bar:"Num. Col·legiat", form_expertise:"Experiència", form_upload:"Pujar Credencials", btn_verify:"Enviar",
+                dash_market:"Mercat", dash_live:"Oportunitats", dash_earn:"Guanys", dash_avail:"Saldo Disponible", btn_withdraw:"Retirar", dash_req:"Sol·licituds",
+                invite_title:"Convidar Col·laborador", invite_cp_t:"Contrapart", invite_cp_d:"Convidar a negociar.", invite_pt_t:"Revisió de Soci", invite_pt_d:"Obtingues una revisió certificada.",
+                feat_vetted_t: "Esborranys Verificats", feat_vetted_d: "Documents amb puntuació 90%+.", feat_payout_t: "Pagaments Inst.", feat_payout_d: "Fons en custòdia.",
+                btn_get_started: "Començar", btn_trial: "Prova Gratuïta", btn_sales: "Contactar Vendes", pricing_title: "Preus per a empreses modernes", demo_header: "Prova l'Editor",
+                price_f_1: "1 Usuari", price_f_2: "5 Documents/mes", price_f_3: "Clàusules Estàndard",
+                price_p_1: "3 Usuaris", price_p_2: "Redacció Il·limitada", price_p_3: "Copilot de Negociació", price_p_4: "Puntuació de Risc",
+                price_e_1: "Usuaris Il·limitats", price_e_2: "Accés API", price_e_3: "SSO / SAML", price_e_4: "Auditoria",
+                modal_dpa_title: "DPA (RGPD)", modal_dpa_body: "Compliment Art 28 RGPD. El client és el Responsable. Altus és l'Encarregat. Allotjament a França. Sense transferències als EUA.",
+                modal_priv_title: "Privacitat", modal_priv_body: "Allotjament exclusiu a França. Xifrat AES-256. Política estricta de no entrenament amb dades del client.",
+                modal_terms_title: "Termes", modal_terms_body: "Altus és un proveïdor de tecnologia, no un bufet. L'ús no crea una relació advocat-client.",
+                prob_speed_t: "Velocitat", prob_speed_bad: "3-5 dies", prob_speed_good: "30 segons amb IA",
+                prob_cost_t: "Cost", prob_cost_bad: "350€/h", prob_cost_good: "Tarifa Plana",
+                prob_clar_t: "Claredat", prob_clar_bad: "Jerga Legal", prob_clar_good: "Llenguatge Clar",
+                arch_title: "Arquitectura Sobirana", arch_subtitle: "Dissenyat per a França, Espanya i Andorra.",
+                arch_feat_1_t: "Allotjament UE", arch_feat_1_d: "Scaleway (París). Sense transferències EUA.",
+                arch_feat_2_t: "Xifrat AES-256", arch_feat_2_d: "Claus gestionades a la UE.",
+                opt_all_jur: "Totes Jurisdiccions", opt_fr: "França", opt_es: "Espanya", opt_ad: "Andorra", opt_all_type: "Tots Tipus",
+                job_saas: "Contracte SaaS", job_emp: "Contracte Indef.", job_lease: "Arrendament", job_free: "Freelance", job_dpa: "DPA", job_nda: "NDA", job_sales: "Vendes", job_consult: "Consultoria",
+                review_btn: "Acceptar"
+            }
+        };
+
+        window.switchView = (viewId) => { document.querySelectorAll('.view-section, .hidden-view').forEach(el => el.classList.add('hidden-view')); const target = document.getElementById(`view-${viewId}`); if(target) { target.classList.remove('hidden-view'); target.classList.add('view-section'); window.scrollTo(0,0); if(viewId==='lawyer-dashboard') window.generateContracts(); } };
+        window.setLanguage = (lang) => { window.currentLang = lang; document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if(window.translations[lang][key]) el.innerText = window.translations[lang][key]; }); document.getElementById('current-lang-label').innerText = lang.toUpperCase(); if(!document.getElementById('view-lawyer-dashboard').classList.contains('hidden-view')) window.generateContracts(); };
+        window.handleLawyerSignup = (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerText = 'Verifying...'; setTimeout(() => { document.getElementById('auth-buttons-logged-out').classList.add('hidden'); document.getElementById('auth-buttons-logged-in').classList.remove('hidden'); window.switchView('lawyer-dashboard'); }, 1000); };
+        window.handleCustomerSignup = (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); btn.innerHTML = 'Building Workspace...'; setTimeout(() => { window.switchView('landing'); document.getElementById('demo-section').scrollIntoView({behavior: 'smooth'}); }, 1000); };
+        window.logout = () => { document.getElementById('auth-buttons-logged-out').classList.remove('hidden'); document.getElementById('auth-buttons-logged-in').classList.add('hidden'); window.switchView('landing'); };
+
+        // LARGE DATASET GENERATOR (24 Items)
+        window.generateContracts = () => {
+            const grid = document.getElementById('contract-grid'); grid.innerHTML = '';
+            const jurFilter = document.getElementById('filter-jur').value; const typeFilter = document.getElementById('filter-type').value;
+            
+            // Translations mapping for dynamic data
+            const jobTitles = {
+                "SaaS MSA": window.t("job_saas"), "Emp. Contract": window.t("job_emp"), "Lease": window.t("job_lease"),
+                "Freelance": window.t("job_free"), "DPA": window.t("job_dpa"), "NDA": window.t("job_nda"),
+                "Sales Agmt": window.t("job_sales"), "Consulting": window.t("job_consult")
+            };
+
+            const baseData = [
+                { t: "SaaS MSA", y: "it", p: 150, pg: 12, f: "fr", j: "France", s: 65, c: "blue" }, { t: "Emp. Contract", y: "hr", p: 80, pg: 8, f: "es", j: "Spain", s: 92, c: "purple" },
+                { t: "Lease", y: "re", p: 250, pg: 25, f: "ad", j: "Andorra", s: 45, c: "teal" }, { t: "Freelance", y: "hr", p: 90, pg: 6, f: "fr", j: "France", s: 70, c: "purple" },
+                { t: "DPA", y: "it", p: 120, pg: 15, f: "fr", j: "France", s: 88, c: "blue" }, { t: "NDA", y: "it", p: 50, pg: 4, f: "es", j: "Spain", s: 95, c: "blue" },
+                { t: "Sales Agmt", y: "re", p: 200, pg: 18, f: "ad", j: "Andorra", s: 60, c: "teal" }, { t: "Consulting", y: "hr", p: 110, pg: 10, f: "fr", j: "France", s: 82, c: "purple" },
+            ];
+            let jobsData = []; for(let i=0; i<3; i++) jobsData = jobsData.concat(baseData.map(x => ({...x, p: x.p + (i*10), s: Math.min(99, x.s + (i*2)) })));
+
+            const filtered = jobsData.filter(j => (jurFilter === 'all' || j.f === jurFilter) && (typeFilter === 'all' || j.y === typeFilter));
+            filtered.forEach(job => {
+                const scoreColor = job.s > 80 ? 'text-green-400' : (job.s < 50 ? 'text-red-400' : 'text-amber-400');
+                const displayTitle = jobTitles[job.t] || job.t;
+                grid.innerHTML += `<div class="bg-slate-800 rounded-xl border border-slate-700 p-5 hover:border-brand-500/50 transition-all hover:shadow-xl group relative flex flex-col"><div class="flex justify-between items-start mb-4"><div class="flex items-center gap-3"><div class="p-2.5 bg-${job.c}-500/10 rounded-lg text-${job.c}-400"><i data-lucide="file-text" class="w-6 h-6"></i></div><div><h3 class="font-bold text-white text-sm">${displayTitle}</h3><p class="text-xs text-slate-500 uppercase">${job.y}</p></div></div><div class="bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-md text-sm font-bold font-mono">€${job.p}</div></div><div class="space-y-2 mb-4 flex-1"><div class="flex justify-between text-sm border-b border-slate-700/50 pb-2"><span class="text-slate-400">Jurisdiction</span><span class="flex items-center gap-1.5 text-white"><img src="https://flagcdn.com/w20/${job.f}.png" class="w-3.5 rounded-sm"> ${job.j}</span></div><div class="flex justify-between text-sm pt-1"><span class="text-slate-400">AI Risk Score</span><span class="${scoreColor} font-bold">${job.s}/100</span></div></div><button class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-lg transition-colors">${window.t('review_btn')}</button></div>`;
+            });
+            lucide.createIcons();
+        }
+
+        // EDITOR INTERACTIVITY
+        window.toggleDemoExplanation = (type) => {
+            const pop = document.getElementById('demo-popover'); activeClause = type;
+            pop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+            if(type === 'payment') { pop.style.top = '300px'; document.getElementById('popover-text').innerHTML = "<strong>Net 90</strong> is bad for cash flow. Recommend Net 30."; }
+            else if(type === 'liability') { pop.style.top = '480px'; document.getElementById('popover-text').innerHTML = "<strong>Unlimited liability</strong> is dangerous. Cap it."; }
+            else { pop.style.top = '660px'; document.getElementById('popover-text').innerHTML = "<strong>Immediate termination</strong> is aggressive. Ask for notice."; }
+            document.getElementById('popover-btn-fix').innerText = "Fix This Clause";
+            document.getElementById('popover-btn-fix').onclick = () => window.applyFix(type);
+        }
+
+        window.applyFix = (type) => {
+            fixedClauses[type] = true;
+            const el = document.getElementById(`text-${type}`);
+            const pulse = document.getElementById(`pulse-${type}`);
+            pulse.style.display = 'none';
+            document.getElementById('demo-popover').classList.add('opacity-0', 'pointer-events-none');
+            if(type === 'payment') { el.innerHTML = "2.1. Client shall pay all undisputed invoices within <strong class='text-green-600'>thirty (30) days</strong> of receipt. Late payments shall incur 1.5% interest."; el.classList.replace('bg-amber-50', 'bg-green-50'); el.classList.replace('border-amber-500', 'border-green-500'); }
+            else if(type === 'liability') { el.innerHTML = "3.1. The Provider's aggregate liability shall be limited to the <strong class='text-green-600'>total fees paid</strong> during the preceding 12 months."; el.classList.replace('bg-red-50', 'bg-green-50'); el.classList.replace('border-red-500', 'border-green-500'); }
+            else if(type === 'termination') { el.innerHTML = "4.1. The Provider may terminate this Agreement for convenience with <strong class='text-green-600'>thirty (30) days</strong> prior written notice."; el.classList.replace('bg-amber-50', 'bg-green-50'); el.classList.replace('border-amber-500', 'border-green-500'); }
+            window.updateScore();
+        }
+        
+        window.applyGlobalFairness = () => { Object.keys(fixedClauses).forEach(key => { if(!fixedClauses[key]) window.applyFix(key); }); }
+
+        window.updateScore = () => {
+            let score = 45; let risks = 3;
+            if(fixedClauses.payment) { score += 15; risks--; }
+            if(fixedClauses.liability) { score += 25; risks--; }
+            if(fixedClauses.termination) { score += 13; risks--; }
+            document.getElementById('bar-robustness').style.width = `${score}%`; document.getElementById('score-robustness').innerText = `${score}/100`;
+            
+            if(score > 80) { 
+                document.getElementById('bar-robustness').className = "h-full bg-green-500 transition-all"; 
+                document.getElementById('bar-clarity').className = "h-full bg-green-500 transition-all"; document.getElementById('bar-clarity').style.width = "92%";
+                // Update Sidebar State Logic (Fix for Conflict Panel)
+                const negBox = document.getElementById('neg-box');
+                negBox.innerHTML = `<div class="flex items-center gap-2 mb-2"><div class="p-1.5 bg-green-100 rounded-md"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i></div><h3 class="text-xs font-bold text-green-900 uppercase">Negotiation Resolved</h3></div><p class="text-[10px] text-green-700 leading-relaxed">All terms are now balanced according to market standards.</p><div class="mt-3 p-2 bg-green-100 border border-green-200 rounded text-[10px] text-green-800 text-center font-bold cursor-pointer">Ready for Signature</div>`;
+                lucide.createIcons();
+                setTimeout(() => document.getElementById('cert-stamp').classList.remove('hidden'), 500);
+            }
+        }
+        
+        window.triggerReviewSimulation = () => { window.closeModal('invite-modal'); document.getElementById('collab-badge').style.display = 'flex'; const negPanel = document.getElementById('negotiation-panel'); negPanel.classList.remove('hidden'); setTimeout(() => negPanel.classList.remove('opacity-0'), 100); }
+        window.triggerUpsell = () => { alert("Redirecting to Stripe Payment (€150.00)..."); window.closeModal('invite-modal'); }
+        window.openModal = (id) => { document.getElementById(id).classList.remove('hidden'); setTimeout(()=>document.getElementById(id).classList.remove('modal-closed'),10); }
+        window.closeModal = (id) => { document.getElementById(id).classList.add('modal-closed'); setTimeout(()=>document.getElementById(id).classList.add('hidden'),300); }
+        window.setJur = (code) => { document.getElementById('demo-flag').src = `https://flagcdn.com/w40/${code}.png`; window.closeModal('jur-modal'); }
+        
+        document.addEventListener('DOMContentLoaded', () => { window.switchView('landing'); window.setLanguage('en'); });
+    </script>
+</body>
+</html>
