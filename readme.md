@@ -6,9 +6,6 @@
 
 **Live Demo:** https://adambaali.github.io/law-tech-demo
 
-**Slides:** https://adambaali.github.io/law-tech-demo/slides
-
-
 ## 🚀 Executive Summary
 **Altus** (working title) is the first AI-native legal workspace designed specifically for the **Sovereign Data requirements** of France, Spain, and Andorra. We solve the "Legal Bottleneck" for SMBs by replacing the billable hour with instant, AI-verified contract drafting and review.
 
