@@ -1,8 +1,10 @@
 # Altus | Sovereign AI Legal Platform (Prototype)
 
-**Project Status:** High-Fidelity Interactive Prototype (MVP Candidate)
+**Project Status:** High-Fidelity Interactive Prototype (MVP Candidate)\
+
 **Project Name:** Altus (Working Title / Codename)
-**Live Demo:** [Insert your GitHub Pages Link Here]
+
+**Live Demo:** https://adambaali.github.io/law-tech-demo
 
 ## 🚀 Executive Summary
 **Altus** (working title) is the first AI-native legal workspace designed specifically for the **Sovereign Data requirements** of France, Spain, and Andorra. We solve the "Legal Bottleneck" for SMBs by replacing the billable hour with instant, AI-verified contract drafting and review.
