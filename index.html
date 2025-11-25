@@ -18,7 +18,6 @@
                     colors: {
                         brand: { 50:'#eff6ff', 100:'#dbeafe', 400:'#60a5fa', 500:'#3b82f6', 600:'#2563eb', 700:'#1d4ed8' },
                         slate: { 800:'#1e293b', 850:'#162032', 900:'#0f172a' },
-                        teal: { 400: '#2dd4bf', 500: '#14b8a6' }
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
                     backgroundImage: { 'grid-pattern': "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%233b82f6' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E\")" }
@@ -28,24 +27,42 @@
     </script>
 
     <style>
+        /* Core UI */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         body { background-color: #0f172a; color: #cbd5e1; }
         .glass-panel { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        
+        /* Interactive Elements */
         .tech-card { background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.7) 100%); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.3s ease; }
         .tech-card:hover { border-color: rgba(59, 130, 246, 0.4); transform: translateY(-2px); box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.15); }
+        
+        /* Animation Utilities */
         .hidden-view { display: none !important; }
         .view-section { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Toggles & Stamps */
         .toggle-checkbox:checked { right: 0; border-color: #3b82f6; }
         .toggle-checkbox:checked + .toggle-label { background-color: #3b82f6; }
         @keyframes stamp { 0% { opacity: 0; transform: scale(2) rotate(-10deg); } 50% { opacity: 1; transform: scale(0.9) rotate(-10deg); } 100% { transform: scale(1) rotate(-10deg); } }
         .stamp-seal { animation: stamp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
         .scan-line { position: absolute; left: 0; width: 100%; height: 2px; background: linear-gradient(to right, transparent, #3b82f6, transparent); animation: scan 4s linear infinite; pointer-events: none; z-index: 10; }
         @keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+        
+        /* Pricing Styles */
+        .feat-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #334155; font-size: 0.875rem; }
+        .feat-row:last-child { border-bottom: none; }
+        .feat-label { color: #94a3b8; }
+        .feat-val { font-weight: 600; color: white; text-align: right; }
         .check-list li { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; color: #cbd5e1; font-size: 0.875rem; }
         .check-list li i { color: #3b82f6; width: 1rem; height: 1rem; }
+        
+        /* Tooltip */
+        .tooltip { position: relative; cursor: help; border-bottom: 1px dotted #64748b; }
+        .tooltip:hover::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #1e293b; padding: 6px 10px; border-radius: 6px; font-size: 11px; white-space: nowrap; border: 1px solid #334155; margin-bottom: 5px; z-index: 50; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body class="font-sans antialiased overflow-x-hidden selection:bg-brand-500 selection:text-white">
@@ -123,13 +140,30 @@
                                 <a href="#clause-liability" class="block p-2 text-slate-400 text-sm hover:text-white">3. Liability</a>
                                 <a href="#clause-termination" class="block p-2 text-slate-400 text-sm hover:text-white">4. Termination</a>
                             </div>
-                            <div class="mt-auto">
+                            <div class="mt-auto relative" id="jur-container">
                                 <div class="text-xs font-bold text-slate-500 uppercase mb-2" data-i18n="sidebar_jur">Jurisdiction</div>
-                                <button onclick="window.openModal('jur-modal')" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-600 flex items-center gap-3 hover:border-brand-500 transition-colors text-left group">
+                                <button onclick="document.getElementById('jur-dropdown').classList.toggle('hidden')" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-600 flex items-center gap-3 hover:border-brand-500 transition-colors text-left group">
                                     <img src="https://flagcdn.com/w40/fr.png" class="w-5 rounded-sm" id="demo-flag">
-                                    <div class="flex-1"><div class="text-white text-sm font-medium group-hover:text-brand-400" id="demo-jurisdiction">France</div><div class="text-xs text-slate-500" id="demo-law-system">Civil Code</div></div>
-                                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+                                    <div class="flex-1">
+                                        <div class="text-white text-sm font-medium group-hover:text-brand-400" id="demo-jurisdiction">France</div>
+                                        <div class="text-xs text-slate-500" id="demo-law-system">Civil Code</div>
+                                    </div>
+                                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500"></i>
                                 </button>
+                                <div id="jur-dropdown" class="hidden absolute bottom-full left-0 w-full mb-2 bg-slate-800 border border-slate-600 rounded-xl shadow-2xl overflow-hidden z-50">
+                                    <button onclick="window.setJur('fr')" class="w-full flex items-center gap-3 p-3 hover:bg-slate-700 transition-colors text-left border-b border-slate-700/50">
+                                        <img src="https://flagcdn.com/w40/fr.png" class="w-5 rounded-sm">
+                                        <div><div class="text-white text-sm font-bold">France</div><div class="text-[10px] text-slate-400">Civil Code</div></div>
+                                    </button>
+                                    <button onclick="window.setJur('es')" class="w-full flex items-center gap-3 p-3 hover:bg-slate-700 transition-colors text-left border-b border-slate-700/50">
+                                        <img src="https://flagcdn.com/w40/es.png" class="w-5 rounded-sm">
+                                        <div><div class="text-white text-sm font-bold">Spain</div><div class="text-[10px] text-slate-400">Código Civil</div></div>
+                                    </button>
+                                    <button onclick="window.setJur('ad')" class="w-full flex items-center gap-3 p-3 hover:bg-slate-700 transition-colors text-left">
+                                        <img src="https://flagcdn.com/w40/ad.png" class="w-5 rounded-sm">
+                                        <div><div class="text-white text-sm font-bold">Andorra</div><div class="text-[10px] text-amber-400">Mixed System</div></div>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -202,17 +236,33 @@
                 <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
                     <div class="p-8 rounded-2xl bg-slate-900 border border-slate-700 flex flex-col">
                         <h3 class="text-lg font-medium text-slate-300 mb-2">Free</h3><div class="text-4xl font-bold text-white mb-6">€0</div>
-                        <ul class="check-list mb-8"><li><i data-lucide="check"></i><span data-i18n="price_f_1">1 User</span></li><li><i data-lucide="check"></i><span data-i18n="price_f_2">5 Basic Documents/mo</span></li><li><i data-lucide="check"></i><span data-i18n="price_f_3">Standard Clauses</span></li></ul>
+                        <div class="space-y-0 mb-8">
+                            <div class="feat-row"><span class="feat-label" data-i18n="pr_contract">Contract Limit</span><span class="feat-val">1 / mo</span></div>
+                            <div class="feat-row"><span class="feat-label" data-i18n="pr_ai">AI Copilot</span><span class="feat-val text-slate-500">Basic</span></div>
+                            <div class="feat-row"><span class="feat-label" data-i18n="pr_market">Marketplace</span><span class="feat-val text-white">Access</span></div>
+                            <div class="feat-row"><span class="feat-label" data-i18n="pr_support">Support</span><span class="feat-val text-slate-500">Email</span></div>
+                        </div>
                         <button onclick="window.switchView('customer-signup')" class="w-full py-3 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors mt-auto" data-i18n="btn_get_started">Get Started</button>
                     </div>
                     <div class="relative p-8 rounded-2xl bg-slate-900 border border-brand-500 shadow-2xl flex flex-col transform scale-105 z-10">
-                        <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 bg-brand-600 text-white text-xs font-bold rounded-full">POPULAR</div><h3 class="text-lg font-medium text-brand-400 mb-2">Pro</h3><div class="text-4xl font-bold text-white mb-6">€60<span class="text-sm text-slate-500 font-normal">/mo</span></div>
-                        <ul class="check-list mb-8"><li><i data-lucide="check"></i><span data-i18n="price_p_1">3 Users</span></li><li><i data-lucide="check"></i><span data-i18n="price_p_2">Unlimited Drafting</span></li><li><i data-lucide="check"></i><span data-i18n="price_p_3">Negotiation Copilot</span></li><li><i data-lucide="check"></i><span data-i18n="price_p_4">Risk Scoring</span></li></ul>
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 bg-brand-600 text-white text-xs font-bold rounded-full">POPULAR</div>
+                        <h3 class="text-lg font-medium text-brand-400 mb-2">Pro</h3><div class="text-4xl font-bold text-white mb-6">€60<span class="text-sm text-slate-500 font-normal">/mo</span></div>
+                        <div class="space-y-0 mb-8">
+                            <div class="feat-row"><span class="feat-label" data-i18n="pr_contract">Contract Limit</span><span class="feat-val tooltip" data-tip="Fair Use (30/mo)">High Vol.</span></div>
+                            <div class="feat-row"><span class="feat-label" data-i18n="pr_ai">AI Copilot</span><span class="feat-val text-brand-400 tooltip" data-tip="Civil Code Standard">Standard</span></div>
+                            <div class="feat-row"><span class="feat-label" data-i18n="pr_market">Marketplace</span><span class="feat-val text-brand-400">Priority</span></div>
+                            <div class="feat-row"><span class="feat-label" data-i18n="pr_support">Support</span><span class="feat-val">Chat</span></div>
+                        </div>
                         <button class="w-full py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-500 transition-colors mt-auto" data-i18n="btn_trial">Start Trial</button>
                     </div>
                     <div class="p-8 rounded-2xl bg-slate-900 border border-slate-700 flex flex-col">
                         <h3 class="text-lg font-medium text-slate-300 mb-2">Enterprise</h3><div class="text-4xl font-bold text-white mb-6">€450<span class="text-sm text-slate-500 font-normal">/mo</span></div>
-                        <ul class="check-list mb-8"><li><i data-lucide="check"></i><span data-i18n="price_e_1">Unlimited Users</span></li><li><i data-lucide="check"></i><span data-i18n="price_e_2">API Access</span></li><li><i data-lucide="check"></i><span data-i18n="price_e_3">SSO / SAML</span></li></ul>
+                        <div class="space-y-0 mb-8">
+                            <div class="feat-row"><span class="feat-label" data-i18n="pr_contract">Contract Limit</span><span class="feat-val">Custom</span></div>
+                            <div class="feat-row"><span class="feat-label" data-i18n="pr_ai">AI Copilot</span><span class="feat-val text-brand-400 tooltip" data-tip="Custom Knowledge Base">Custom</span></div>
+                            <div class="feat-row"><span class="feat-label" data-i18n="pr_market">Marketplace</span><span class="feat-val text-white">Retainer</span></div>
+                            <div class="feat-row"><span class="feat-label" data-i18n="pr_support">Support</span><span class="feat-val text-brand-400">Dedicated Mgr</span></div>
+                        </div>
                         <button class="w-full py-3 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors mt-auto" data-i18n="btn_sales">Contact Sales</button>
                     </div>
                 </div>
@@ -276,7 +326,7 @@
                 <div class="flex items-center justify-between mb-4"><h1 class="text-lg font-bold text-white flex items-center gap-2"><span data-i18n="dash_req">Open Requests</span> <span class="bg-brand-500/20 text-brand-400 text-xs px-2 py-0.5 rounded-full border border-brand-500/30 animate-pulse">Live Feed</span></h1></div>
                 <div class="flex gap-4">
                     <select id="filter-jur" onchange="window.generateContracts()" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg p-2 outline-none"><option value="all" data-i18n="opt_all_jur">All Jurisdictions</option><option value="fr" data-i18n="opt_fr">France</option><option value="es" data-i18n="opt_es">Spain</option><option value="ad" data-i18n="opt_ad">Andorra</option></select>
-                    <select id="filter-type" onchange="window.generateContracts()" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg p-2 outline-none"><option value="all" data-i18n="opt_all_type">All Types</option><option value="it">IT / SaaS</option><option value="hr">HR / Labor</option><option value="re">Real Estate</option></select>
+                    <select id="filter-type" onchange="window.generateContracts()" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg p-2 outline-none"><option value="all" data-i18n="opt_all_type">All Types</option><option value="it">IT / SaaS</option><option value="hr">HR / Labor</option><option value="re">Real Estate</option><option value="co">Compliance</option></select>
                 </div>
             </div>
             <div class="p-8 pb-32"><div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" id="contract-grid"></div></div>
@@ -340,9 +390,7 @@
                 feat_vetted_t: "Pre-Vetted Drafts", feat_vetted_d: "Receive documents that score 90%+ on internal robustness checks.",
                 feat_payout_t: "Instant Payouts", feat_payout_d: "Funds are escrowed by Altus before you start the review.",
                 btn_get_started: "Get Started", btn_trial: "Start Trial", btn_sales: "Contact Sales", pricing_title: "Pricing for modern companies", demo_header: "Try the Editor",
-                price_f_1: "1 User", price_f_2: "5 Basic Documents/mo", price_f_3: "Standard Clauses",
-                price_p_1: "3 Users", price_p_2: "Unlimited Drafting", price_p_3: "Negotiation Copilot", price_p_4: "Risk Scoring",
-                price_e_1: "Unlimited Users", price_e_2: "API Access", price_e_3: "SSO / SAML", price_e_4: "Audit Logs",
+                pr_contract: "Contract Limit", pr_ai: "AI Copilot", pr_market: "Marketplace", pr_support: "Support",
                 modal_dpa_title: "DPA", modal_dpa_body: "Full Article 28 GDPR Compliance. The Customer acts as the Data Controller. Altus Technologies SAS acts as the Data Processor. Sub-processors include Scaleway (France) and OVHcloud (France). No data transfer to the US.",
                 modal_priv_title: "Privacy", modal_priv_body: "Data is hosted exclusively in France (Scaleway). We use AES-256 encryption at rest and TLS 1.3 in transit. We strictly enforce a Zero-Training policy.",
                 modal_terms_title: "Terms", modal_terms_body: "Altus is a technology provider, not a law firm. The platform provides document assistance. Use does not constitute an attorney-client relationship.",
@@ -354,7 +402,8 @@
                 arch_feat_2_t: "AES-256 Encryption", arch_feat_2_d: "Keys managed via EU-based HSMs.",
                 opt_all_jur: "All Jurisdictions", opt_fr: "France", opt_es: "Spain", opt_ad: "Andorra", opt_all_type: "All Types",
                 job_saas: "SaaS MSA", job_emp: "Emp. Contract", job_lease: "Lease", job_free: "Freelance", job_dpa: "DPA", job_nda: "NDA", job_sales: "Sales Agmt", job_consult: "Consulting",
-                review_btn: "Accept & Review"
+                review_btn: "Accept & Review", neg_res_title: "Negotiation Resolved", neg_res_body: "All terms are now balanced according to market standards.", neg_res_badge: "Ready for Signature",
+                type_it: "IT / SaaS", type_hr: "HR / Labor", type_re: "Real Estate", type_co: "Compliance"
             },
             fr: { 
                 nav_platform:"Plateforme", nav_partners:"Partenaires", nav_pricing:"Tarifs", nav_login:"Connexion", nav_start:"Essai", nav_logout:"Déconnexion",
@@ -370,6 +419,7 @@
                 price_f_1: "1 Utilisateur", price_f_2: "5 Documents/mois", price_f_3: "Clauses Standard",
                 price_p_1: "3 Utilisateurs", price_p_2: "Rédaction Illimitée", price_p_3: "Copilote de Négociation", price_p_4: "Score de Risque",
                 price_e_1: "Utilisateurs Illimités", price_e_2: "Accès API", price_e_3: "SSO / SAML", price_e_4: "Journaux d'Audit",
+                pr_contract: "Limite Contrats", pr_ai: "Copilote IA", pr_market: "Marché", pr_support: "Support",
                 modal_dpa_title: "DPA (RGPD)", modal_dpa_body: "Conformité totale Art 28 RGPD. Le client est Responsable de Traitement. Altus est Sous-traitant. Hébergement Scaleway (France). Pas de transfert US.",
                 modal_priv_title: "Confidentialité", modal_priv_body: "Hébergement exclusif en France. Chiffrement AES-256. Politique stricte de non-entraînement sur vos données.",
                 modal_terms_title: "CGU", modal_terms_body: "Altus est un fournisseur technologique, pas un cabinet d'avocats. L'utilisation ne crée pas de relation avocat-client.",
@@ -381,7 +431,8 @@
                 arch_feat_2_t: "Chiffrement AES-256", arch_feat_2_d: "Clés gérées via HSM en UE.",
                 opt_all_jur: "Toutes Juridictions", opt_fr: "France", opt_es: "Espagne", opt_ad: "Andorre", opt_all_type: "Tous Types",
                 job_saas: "Contrat SaaS", job_emp: "CDI Cadre", job_lease: "Bail Comm.", job_free: "Freelance", job_dpa: "DPA", job_nda: "NDA", job_sales: "Contrat Vente", job_consult: "Consulting",
-                review_btn: "Accepter"
+                review_btn: "Accepter", neg_res_title: "Négociation Résolue", neg_res_body: "Tous les termes sont équilibrés.", neg_res_badge: "Prêt pour Signature",
+                type_it: "Services IT", type_hr: "Ressources Humaines", type_re: "Immobilier", type_co: "Conformité"
             },
             es: { 
                 nav_platform:"Plataforma", nav_partners:"Socios", nav_pricing:"Precios", nav_login:"Acceso", nav_start:"Empezar", nav_logout:"Salir",
@@ -397,6 +448,7 @@
                 price_f_1: "1 Usuario", price_f_2: "5 Documentos/mes", price_f_3: "Cláusulas Estándar",
                 price_p_1: "3 Usuarios", price_p_2: "Redacción Ilimitada", price_p_3: "Copiloto de Negociación", price_p_4: "Puntuación de Riesgo",
                 price_e_1: "Usuarios Ilimitados", price_e_2: "Acceso API", price_e_3: "SSO / SAML", price_e_4: "Auditoría",
+                pr_contract: "Límite Contratos", pr_ai: "Copiloto IA", pr_market: "Mercado", pr_support: "Soporte",
                 modal_dpa_title: "DPA (RGPD)", modal_dpa_body: "Cumplimiento Art 28 RGPD. El cliente es el Responsable. Altus es el Encargado. Alojamiento en Francia. Sin transferencias a EE.UU.",
                 modal_priv_title: "Privacidad", modal_priv_body: "Alojamiento exclusivo en Francia. Cifrado AES-256. Política estricta de no entrenamiento con datos del cliente.",
                 modal_terms_title: "Términos", modal_terms_body: "Altus es un proveedor de tecnología, no un bufete. El uso no crea una relación abogado-cliente.",
@@ -408,7 +460,8 @@
                 arch_feat_2_t: "Cifrado AES-256", arch_feat_2_d: "Claves en HSM UE.",
                 opt_all_jur: "Todas Jurisdicciones", opt_fr: "Francia", opt_es: "España", opt_ad: "Andorra", opt_all_type: "Todos Tipos",
                 job_saas: "Contrato SaaS", job_emp: "Contrato Indef.", job_lease: "Arrendamiento", job_free: "Freelance", job_dpa: "DPA", job_nda: "NDA", job_sales: "Ventas", job_consult: "Consultoría",
-                review_btn: "Aceptar"
+                review_btn: "Aceptar", neg_res_title: "Negociación Resuelta", neg_res_body: "Términos equilibrados.", neg_res_badge: "Listo para Firma",
+                type_it: "Servicios IT", type_hr: "Recursos Humanos", type_re: "Inmobiliario", type_co: "Cumplimiento"
             },
             ca: { 
                 nav_platform:"Plataforma", nav_partners:"Socis", nav_pricing:"Preus", nav_login:"Accés", nav_start:"Començar", nav_logout:"Sortir",
@@ -424,6 +477,7 @@
                 price_f_1: "1 Usuari", price_f_2: "5 Documents/mes", price_f_3: "Clàusules Estàndard",
                 price_p_1: "3 Usuaris", price_p_2: "Redacció Il·limitada", price_p_3: "Copilot de Negociació", price_p_4: "Puntuació de Risc",
                 price_e_1: "Usuaris Il·limitats", price_e_2: "Accés API", price_e_3: "SSO / SAML", price_e_4: "Auditoria",
+                pr_contract: "Límit Contractes", pr_ai: "Copilot IA", pr_market: "Mercat", pr_support: "Suport",
                 modal_dpa_title: "DPA (RGPD)", modal_dpa_body: "Compliment Art 28 RGPD. El client és el Responsable. Altus és l'Encarregat. Allotjament a França. Sense transferències als EUA.",
                 modal_priv_title: "Privacitat", modal_priv_body: "Allotjament exclusiu a França. Xifrat AES-256. Política estricta de no entrenament amb dades del client.",
                 modal_terms_title: "Termes", modal_terms_body: "Altus és un proveïdor de tecnologia, no un bufet. L'ús no crea una relació advocat-client.",
@@ -435,7 +489,8 @@
                 arch_feat_2_t: "Xifrat AES-256", arch_feat_2_d: "Claus gestionades a la UE.",
                 opt_all_jur: "Totes Jurisdiccions", opt_fr: "França", opt_es: "Espanya", opt_ad: "Andorra", opt_all_type: "Tots Tipus",
                 job_saas: "Contracte SaaS", job_emp: "Contracte Indef.", job_lease: "Arrendament", job_free: "Freelance", job_dpa: "DPA", job_nda: "NDA", job_sales: "Vendes", job_consult: "Consultoria",
-                review_btn: "Acceptar"
+                review_btn: "Acceptar", neg_res_title: "Negociació Resolta", neg_res_body: "Termes equilibrats.", neg_res_badge: "Llest per Signar",
+                type_it: "Serveis IT", type_hr: "Recursos Humans", type_re: "Immobiliari", type_co: "Compliment"
             }
         };
 
@@ -456,11 +511,14 @@
                 "Freelance": window.t("job_free"), "DPA": window.t("job_dpa"), "NDA": window.t("job_nda"),
                 "Sales Agmt": window.t("job_sales"), "Consulting": window.t("job_consult")
             };
+            const typeTitles = {
+                "it": window.t("type_it"), "hr": window.t("type_hr"), "re": window.t("type_re"), "co": window.t("type_co")
+            };
 
             const baseData = [
                 { t: "SaaS MSA", y: "it", p: 150, pg: 12, f: "fr", j: "France", s: 65, c: "blue" }, { t: "Emp. Contract", y: "hr", p: 80, pg: 8, f: "es", j: "Spain", s: 92, c: "purple" },
                 { t: "Lease", y: "re", p: 250, pg: 25, f: "ad", j: "Andorra", s: 45, c: "teal" }, { t: "Freelance", y: "hr", p: 90, pg: 6, f: "fr", j: "France", s: 70, c: "purple" },
-                { t: "DPA", y: "it", p: 120, pg: 15, f: "fr", j: "France", s: 88, c: "blue" }, { t: "NDA", y: "it", p: 50, pg: 4, f: "es", j: "Spain", s: 95, c: "blue" },
+                { t: "DPA", y: "co", p: 120, pg: 15, f: "fr", j: "France", s: 88, c: "blue" }, { t: "NDA", y: "co", p: 50, pg: 4, f: "es", j: "Spain", s: 95, c: "blue" },
                 { t: "Sales Agmt", y: "re", p: 200, pg: 18, f: "ad", j: "Andorra", s: 60, c: "teal" }, { t: "Consulting", y: "hr", p: 110, pg: 10, f: "fr", j: "France", s: 82, c: "purple" },
             ];
             let jobsData = []; for(let i=0; i<3; i++) jobsData = jobsData.concat(baseData.map(x => ({...x, p: x.p + (i*10), s: Math.min(99, x.s + (i*2)) })));
@@ -469,7 +527,8 @@
             filtered.forEach(job => {
                 const scoreColor = job.s > 80 ? 'text-green-400' : (job.s < 50 ? 'text-red-400' : 'text-amber-400');
                 const displayTitle = jobTitles[job.t] || job.t;
-                grid.innerHTML += `<div class="bg-slate-800 rounded-xl border border-slate-700 p-5 hover:border-brand-500/50 transition-all hover:shadow-xl group relative flex flex-col"><div class="flex justify-between items-start mb-4"><div class="flex items-center gap-3"><div class="p-2.5 bg-${job.c}-500/10 rounded-lg text-${job.c}-400"><i data-lucide="file-text" class="w-6 h-6"></i></div><div><h3 class="font-bold text-white text-sm">${displayTitle}</h3><p class="text-xs text-slate-500 uppercase">${job.y}</p></div></div><div class="bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-md text-sm font-bold font-mono">€${job.p}</div></div><div class="space-y-2 mb-4 flex-1"><div class="flex justify-between text-sm border-b border-slate-700/50 pb-2"><span class="text-slate-400">Jurisdiction</span><span class="flex items-center gap-1.5 text-white"><img src="https://flagcdn.com/w20/${job.f}.png" class="w-3.5 rounded-sm"> ${job.j}</span></div><div class="flex justify-between text-sm pt-1"><span class="text-slate-400">AI Risk Score</span><span class="${scoreColor} font-bold">${job.s}/100</span></div></div><button class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-lg transition-colors">${window.t('review_btn')}</button></div>`;
+                const displayType = typeTitles[job.y] || job.y;
+                grid.innerHTML += `<div class="bg-slate-800 rounded-xl border border-slate-700 p-5 hover:border-brand-500/50 transition-all hover:shadow-xl group relative flex flex-col"><div class="flex justify-between items-start mb-4"><div class="flex items-center gap-3"><div class="p-2.5 bg-${job.c}-500/10 rounded-lg text-${job.c}-400"><i data-lucide="file-text" class="w-6 h-6"></i></div><div><h3 class="font-bold text-white text-sm">${displayTitle}</h3><p class="text-xs text-slate-500 uppercase">${displayType}</p></div></div><div class="bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-md text-sm font-bold font-mono">€${job.p}</div></div><div class="space-y-2 mb-4 flex-1"><div class="flex justify-between text-sm border-b border-slate-700/50 pb-2"><span class="text-slate-400">Jurisdiction</span><span class="flex items-center gap-1.5 text-white"><img src="https://flagcdn.com/w20/${job.f}.png" class="w-3.5 rounded-sm"> ${job.j}</span></div><div class="flex justify-between text-sm pt-1"><span class="text-slate-400">Pages</span><span class="text-white">${job.pg}</span></div><div class="flex justify-between text-sm pt-1"><span class="text-slate-400">Risk Score</span><span class="${scoreColor} font-bold">${job.s}/100</span></div></div><button class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-lg transition-colors">${window.t('review_btn')}</button></div>`;
             });
             lucide.createIcons();
         }
@@ -509,9 +568,10 @@
             if(score > 80) { 
                 document.getElementById('bar-robustness').className = "h-full bg-green-500 transition-all"; 
                 document.getElementById('bar-clarity').className = "h-full bg-green-500 transition-all"; document.getElementById('bar-clarity').style.width = "92%";
-                // Update Sidebar State Logic (Fix for Conflict Panel)
+                // Sidebar Success State
                 const negBox = document.getElementById('neg-box');
-                negBox.innerHTML = `<div class="flex items-center gap-2 mb-2"><div class="p-1.5 bg-green-100 rounded-md"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i></div><h3 class="text-xs font-bold text-green-900 uppercase">Negotiation Resolved</h3></div><p class="text-[10px] text-green-700 leading-relaxed">All terms are now balanced according to market standards.</p><div class="mt-3 p-2 bg-green-100 border border-green-200 rounded text-[10px] text-green-800 text-center font-bold cursor-pointer">Ready for Signature</div>`;
+                negBox.className = "bg-green-50 rounded-xl p-4 border border-green-100 shadow-inner";
+                negBox.innerHTML = `<div class="flex items-center gap-2 mb-2"><div class="p-1.5 bg-green-100 rounded-md"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i></div><h3 class="text-xs font-bold text-green-900 uppercase">${window.t('neg_res_title')}</h3></div><p class="text-[10px] text-green-700 leading-relaxed">${window.t('neg_res_body')}</p><div class="mt-3 p-2 bg-green-100 border border-green-200 rounded text-[10px] text-green-800 text-center font-bold cursor-pointer">${window.t('neg_res_badge')}</div>`;
                 lucide.createIcons();
                 setTimeout(() => document.getElementById('cert-stamp').classList.remove('hidden'), 500);
             }
@@ -521,7 +581,13 @@
         window.triggerUpsell = () => { alert("Redirecting to Stripe Payment (€150.00)..."); window.closeModal('invite-modal'); }
         window.openModal = (id) => { document.getElementById(id).classList.remove('hidden'); setTimeout(()=>document.getElementById(id).classList.remove('modal-closed'),10); }
         window.closeModal = (id) => { document.getElementById(id).classList.add('modal-closed'); setTimeout(()=>document.getElementById(id).classList.add('hidden'),300); }
-        window.setJur = (code) => { document.getElementById('demo-flag').src = `https://flagcdn.com/w40/${code}.png`; window.closeModal('jur-modal'); }
+        window.setJur = (code) => { 
+            document.getElementById('demo-flag').src = `https://flagcdn.com/w40/${code}.png`;
+            const data = {fr: {n:'France', s:'Civil Code'}, es: {n:'Spain', s:'Código Civil'}, ad: {n:'Andorra', s:'Mixed System'}};
+            document.getElementById('demo-jurisdiction').innerText = data[code].n;
+            document.getElementById('demo-law-system').innerText = data[code].s;
+            document.getElementById('jur-dropdown').classList.add('hidden');
+        }
         
         document.addEventListener('DOMContentLoaded', () => { window.switchView('landing'); window.setLanguage('en'); });
     </script>
